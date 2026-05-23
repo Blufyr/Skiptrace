@@ -27,6 +27,115 @@ Response will appear here...
     </div>
 </div>
 
+<!-- Upload Section -->
+<div class="container mt-5">
+    <button class="btn btn-secondary mb-3" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#uploadSection">
+        Toggle Database Upload
+    </button>
+
+    <div id="uploadSection" class="collapse">
+
+        <div class="card p-4 shadow">
+            <h4>Add Single Entry</h4>
+
+            <form id="singleEntryForm" class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Case Number</label>
+                    <input type="text" class="form-control" name="case_number">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">County</label>
+                    <input type="text" class="form-control" name="county">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-control" name="state">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Property Address</label>
+                    <input type="text" class="form-control" name="property_address">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Parcel ID</label>
+                    <input type="text" class="form-control" name="parcel_id">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Surplus Amount</label>
+                    <input type="number" class="form-control" name="surplus_amount">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Sale Date</label>
+                    <input type="date" class="form-control" name="sale_date">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Claimant Name</label>
+                    <input type="text" class="form-control" name="claimant_name">
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" name="notes"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit Entry</button>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <h4>Upload CSV File</h4>
+            <input type="file" id="csvUpload" accept=".csv" class="form-control mb-3">
+            <button class="btn btn-success" onclick="uploadCSV()">Upload CSV</button>
+
+            <pre id="uploadResponse" class="mt-4 bg-dark text-white p-3 rounded"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("singleEntryForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = Object.fromEntries(new FormData(e.target).entries());
+
+    const res = await fetch("/api/upload-entry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+    document.getElementById("uploadResponse").innerText = JSON.stringify(data, null, 2);
+});
+
+async function uploadCSV() {
+    const file = document.getElementById("csvUpload").files[0];
+    if (!file) return alert("Please select a CSV file");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/upload-csv", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    document.getElementById("uploadResponse").innerText = JSON.stringify(data, null, 2);
+}
+</script>
+
 <script>
 async function runSearch() {
     const name = document.getElementById("nameInput").value.trim();
